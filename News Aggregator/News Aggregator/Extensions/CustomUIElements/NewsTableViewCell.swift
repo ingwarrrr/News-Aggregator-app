@@ -12,7 +12,7 @@ enum NewsDetailType {
     case favNews
 }
 
-class NewsTableViewCell: UITableViewCell {
+final class NewsTableViewCell: UITableViewCell {
     
     static var reuseIdentifier: String { "\(Self.self)" }
     var viewModel: NewsFeedViewModelType?
@@ -74,7 +74,11 @@ class NewsTableViewCell: UITableViewCell {
         self.previewImageView.image = nil
     }
     
-    public func configure(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
+    public func configure(
+        with news: UniqueNewsModel,
+        index: Int,
+        type: NewsDetailType
+    ) {
         self.titleLabel.text = news.title
         self.descriptionLabel.text = news.description
         self.creatorLabel.text = news.creator?.first
@@ -82,7 +86,11 @@ class NewsTableViewCell: UITableViewCell {
         setupPreview(with: news, index: index, type: type)
     }
     
-    private func setupPreview(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
+    private func setupPreview(
+        with news: UniqueNewsModel,
+        index: Int,
+        type: NewsDetailType
+    ) {
         switch type {
         case .favNews:
             if let image = UserDefaultsManager.shared.newsImageArray[index] {
@@ -93,8 +101,10 @@ class NewsTableViewCell: UITableViewCell {
         case .news:
             if let imageData = news.imageData {
                 self.previewImageView.image = UIImage(data: imageData)
-            } else if let urlString = news.imageURL,
+            }
+            else if let urlString = news.imageURL,
                     let url = URL(string: urlString) {
+                
                 URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
                     guard let data = data,
                           error == nil,

@@ -65,9 +65,7 @@ class FavoriteNewsViewController: UIViewController {
 extension FavoriteNewsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
-        let count = viewModel.favNewsArray.count
-        
-        return count
+        viewModel.favNewsArray.count
     }
     
     func tableView(_ tableView: UITableView,
@@ -81,7 +79,11 @@ extension FavoriteNewsViewController: UITableViewDataSource {
         }
         let singleNews = viewModel.favNewsArray[indexPath.row]
         cell.sizeToFit()
-        cell.configure(with: singleNews, index: indexPath.row, type: .favNews)
+        cell.configure(
+            with: singleNews,
+            index: indexPath.row,
+            type: .favNews
+        )
         
         return cell
     }}
@@ -91,14 +93,18 @@ extension FavoriteNewsViewController: UITableViewDataSource {
 extension FavoriteNewsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView,
                    heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return ConstraintConstants.tableViewHeight
+        ConstraintConstants.tableViewHeight
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView,
+                   didSelectRowAt indexPath: IndexPath) {
         let singleNews = viewModel.favNewsArray[indexPath.row]
         
         let detailVM = NewsDetailViewModel(news: singleNews)
-        let detailVC = NewsDetailViewController(viewModel: detailVM, typeOfNews: .favNews)
+        let detailVC = NewsDetailViewController(
+            viewModel: detailVM,
+            typeOfNews: .favNews
+        )
         detailVC.indexImage = indexPath.row
         navigationController?.pushViewController(detailVC, animated: true)
         

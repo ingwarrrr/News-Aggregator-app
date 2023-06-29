@@ -9,12 +9,17 @@ import Foundation
 
 enum StringConstants {
     static let emptyString = ""
+    
+    static let newsTabBarText = "News"
+    static let newsTabBarImageName = "tabBarItemNews"
+    static let favNewsTabBarText = "Fav news"
+    static let favNewsTabBarImageName = "tabBarItemFavs"
+    static let anonCreatorText = "Неизвестно"
+    static let starFillImageName = "star.fill"
+    static let starImageName = "star"
+
     static let userDefaultsNewsKey = "newsArray"
     static let userDefaultsNewsImageKey = "newsImageArray"
-    static let newsTabBarText = "News"
-    static let favNewsTabBarText = "Fav news"
-    static let newsTabBarImageName = "tabBarItemNews"
-    static let favNewsTabBarImageName = "tabBarItemFavs"
 
     //MARK: - NewsDetailScreen
     
@@ -25,8 +30,6 @@ enum StringConstants {
     static let publicationDate = "Дата"
     static let linkText = "Ссылка"
     static let noneImage = "none"
-    static let favNewsImage = "none"
-    static let unfavNewsImage = "none"
 }
 
 

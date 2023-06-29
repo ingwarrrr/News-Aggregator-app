@@ -10,28 +10,32 @@ import UIKit
 class UserDefaultsManager
 {
     // MARK:- Properties
-
+    
     public static var shared = UserDefaultsManager()
-
+    
     var newsArray: [UniqueNewsModel] {
         get {
-            guard let data = UserDefaults.standard.data(forKey: StringConstants.userDefaultsNewsKey)
+            guard let data = UserDefaults.standard
+                .data(forKey: StringConstants.userDefaultsNewsKey)
             else {
                 return []
             }
-            return (try? JSONDecoder().decode([UniqueNewsModel].self, from: data)) ?? []
+            return (try? JSONDecoder()
+                .decode([UniqueNewsModel].self, from: data)) ?? []
         }
         set {
             guard let data = try? JSONEncoder().encode(newValue) else {
                 return
             }
-            UserDefaults.standard.set(data, forKey: StringConstants.userDefaultsNewsKey)
+            UserDefaults.standard
+                .set(data, forKey: StringConstants.userDefaultsNewsKey)
         }
     }
     
     var newsImageArray: [UIImage?] {
         get {
-            guard let data = UserDefaults.standard.data(forKey: StringConstants.userDefaultsNewsImageKey)
+            guard let data = UserDefaults.standard
+                .data(forKey: StringConstants.userDefaultsNewsImageKey)
             else {
                 return []
             }
@@ -44,11 +48,12 @@ class UserDefaultsManager
                 image?.jpegData(compressionQuality: 0)
             }
             let encoded =  try? JSONEncoder().encode(data)
-            UserDefaults.standard.set(encoded, forKey: StringConstants.userDefaultsNewsImageKey)
+            UserDefaults.standard
+                .set(encoded, forKey: StringConstants.userDefaultsNewsImageKey)
         }
     }
-
+    
     // MARK:- Init
-
+    
     private init(){}
 }

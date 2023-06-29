@@ -9,20 +9,32 @@ import Foundation
 import Alamofire
 
 protocol NetworkingAPIProtocol {
-    func getNewsFor(nextPage: String?, completion: @escaping (Result<NewsModel, Error>) -> Void)
+    func getNewsFor(
+        nextPage: String?,
+        completion: @escaping (Result<NewsModel, Error>) -> Void
+    )
 }
 
 final class NetworkingAPI: NetworkingAPIProtocol {
     
     // MARK: - Get News Methods
     
-    func getNewsFor(nextPage: String?, completion: @escaping (Result<NewsModel, Error>) -> Void) {
+    func getNewsFor(
+        nextPage: String?,
+        completion: @escaping (Result<NewsModel, Error>) -> Void
+    ) {
         var queryItems = [
-            URLQueryItem(name: QueryItems.apiKeyName, value: QueryItems.apiKeyVal),
-            URLQueryItem(name: QueryItems.countryName, value: QueryItems.countryVal)
+            URLQueryItem(
+                name: QueryItems.apiKeyName, value: QueryItems.apiKeyVal
+            ),
+            URLQueryItem(
+                name: QueryItems.countryName, value: QueryItems.countryVal
+            )
         ]
         if let nextPage = nextPage {
-            queryItems.append(URLQueryItem(name: QueryItems.nextPageName, value: nextPage))
+            queryItems.append(
+                URLQueryItem(name: QueryItems.nextPageName, value: nextPage)
+            )
         }
         
         let urlConstructor = URLConstructor(

@@ -37,10 +37,15 @@ class NewsDetailView: UIView {
         setupLayout()
     }
     
-    func setupDetailView(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
+    func setupDetailView(
+        with news: UniqueNewsModel,
+        index: Int,
+        type: NewsDetailType
+    ) {
         titleView.contentLabel.text = news.title
         descriptionView.contentLabel.text = news.description
-        creatorView.contentLabel.text = news.creator?.first ?? "Неизвестно"
+        creatorView.contentLabel.text =
+            news.creator?.first ?? StringConstants.anonCreatorText
         pubDateView.contentLabel.text = news.pubDate?.formattedDate()
         linkView.contentLabel.text = news.link
         

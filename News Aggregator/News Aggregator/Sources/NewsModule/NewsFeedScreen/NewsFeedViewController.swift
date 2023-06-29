@@ -59,7 +59,7 @@ class NewsFeedViewController: UIViewController {
         }
     }
     
-    func bindWithViewModel() {
+    private func bindWithViewModel() {
         viewModel.getNewsSuccess = { [weak self] news in
             DispatchQueue.main.async {
                 self?.newsTableView.reloadData()
@@ -115,17 +115,23 @@ extension NewsFeedViewController: UITableViewDataSource {
 
 extension NewsFeedViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView,
-                   heightForRowAt indexPath: IndexPath) -> CGFloat {
+                   heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
         return ConstraintConstants.tableViewHeight
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView,
+                   didSelectRowAt indexPath: IndexPath
+    ) {
         guard let singleNews = viewModel.newsArray?[indexPath.row] else {
             return
         }
         
         let detailVM = NewsDetailViewModel(news: singleNews)
-        let detailVC = NewsDetailViewController(viewModel: detailVM, typeOfNews: .news)
+        let detailVC = NewsDetailViewController(
+            viewModel: detailVM,
+            typeOfNews: .news
+        )
         navigationController?.pushViewController(detailVC, animated: true)
         
         tableView.deselectRow(at: indexPath, animated: true)

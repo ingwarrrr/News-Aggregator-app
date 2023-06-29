@@ -15,11 +15,16 @@ class NewsDetailViewController: UIViewController {
     
     private lazy var newsDetailView: NewsDetailView = {
         let detailView = NewsDetailView()
-        detailView.setupDetailView(with: viewModel.news, index: indexImage, type: typeOfNews)
+        detailView.setupDetailView(
+            with: viewModel.news,
+            index: indexImage,
+            type: typeOfNews
+        )
         return detailView
     }()
     
-    init(viewModel: NewsDetailViewModelType, typeOfNews: NewsDetailType) {
+    init(viewModel: NewsDetailViewModelType,
+         typeOfNews: NewsDetailType) {
         self.viewModel = viewModel
         self.typeOfNews = typeOfNews
         super.init(nibName: nil, bundle: nil)
@@ -69,9 +74,13 @@ class NewsDetailViewController: UIViewController {
         )
 
         if isFavourite {
-            btnFavourite.setImage(UIImage(systemName: "star.fill"), for: .normal)
+            btnFavourite.setImage(
+                UIImage(systemName: StringConstants.starFillImageName),
+                for: .normal)
         }else{
-            btnFavourite.setImage(UIImage(systemName: "star"), for: .normal)
+            btnFavourite.setImage(
+                UIImage(systemName: StringConstants.starImageName),
+                for: .normal)
         }
         
         let rightButton = UIBarButtonItem(customView: btnFavourite)

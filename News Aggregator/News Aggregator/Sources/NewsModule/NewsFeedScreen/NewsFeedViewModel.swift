@@ -34,7 +34,6 @@ final class NewsFeedViewModel: NewsFeedViewModelType {
         networknigApi.getNewsFor(nextPage: nextPage) { [weak self] response in
             switch response {
             case .success(let response):
-                print(response)
                 self?.newsModel?.append(response)
                 self?.newsArray?.append(contentsOf: response.results)
                 self?.getNewsSuccess?(response)

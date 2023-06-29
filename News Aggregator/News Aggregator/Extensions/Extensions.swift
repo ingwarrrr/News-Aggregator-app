@@ -13,6 +13,12 @@ extension UIView {
     }
 }
 
+extension UIImage {
+    static func ==(lhs: UIImage, rhs: UIImage) -> Bool {
+        lhs === rhs || lhs.pngData() == rhs.pngData()
+    }
+}
+
 extension String {
     func formattedDate() -> String {
         let dateFormatterGet = DateFormatter()
@@ -26,11 +32,5 @@ extension String {
         } else {
             return self
         }
-    }
-}
-
-extension UIImage {
-    static func ==(lhs: UIImage, rhs: UIImage) -> Bool {
-        lhs === rhs || lhs.pngData() == rhs.pngData()
     }
 }
