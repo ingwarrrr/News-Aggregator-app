@@ -10,6 +10,8 @@ import UIKit
 class NewsFeedViewController: UIViewController {
     
     var viewModel: NewsFeedViewModelType
+    var currentPage : Int = 0
+    var isLoadingList : Bool = false
     
     private lazy var newsTableView: UITableView = {
         let tableView = UITableView()
@@ -37,11 +39,11 @@ class NewsFeedViewController: UIViewController {
         setupHierarchy()
         setupLayout()
         bindWithViewModel()
-        viewModel.getNewsData()
+        viewModel.getNewsData(for: nil)
     }
     
     private func setupView() {
-        title = "News"
+        title = StringConstants.newsTabBarText
         view.backgroundColor = .white
     }
     
@@ -61,15 +63,20 @@ class NewsFeedViewController: UIViewController {
         viewModel.getNewsSuccess = { [weak self] news in
             DispatchQueue.main.async {
                 self?.newsTableView.reloadData()
+                self?.isLoadingList = false
             }
         }
         
-        viewModel.getNewsFailure = { [weak self] error in
+        viewModel.getNewsFailure = { error in
             print(error.localizedDescription)
-            DispatchQueue.main.async {
-                self?.newsTableView.reloadData()
-            }
         }
+    }
+    
+    private func loadMoreItemsForList(){
+        guard let nextPage = viewModel.newsModel?.last?.nextPage else {
+            return
+        }
+        viewModel.getNewsData(for: nextPage)
     }
 }
 
@@ -79,7 +86,7 @@ class NewsFeedViewController: UIViewController {
 extension NewsFeedViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
-        guard let count = viewModel.newsArray?.results.count else {
+        guard let count = viewModel.newsArray?.count else {
             return 0
         }
         
@@ -92,14 +99,14 @@ extension NewsFeedViewController: UITableViewDataSource {
             withIdentifier: NewsTableViewCell.reuseIdentifier,
             for: indexPath
         ) as? NewsTableViewCell,
-            let singleNews = viewModel.newsArray?.results[indexPath.row]
+            let singleNews = viewModel.newsArray?[indexPath.row]
         else {
             return UITableViewCell()
         }
         
         cell.sizeToFit()
         cell.viewModel = viewModel
-        cell.configure(with: singleNews, index: indexPath.row)
+        cell.configure(with: singleNews, index: indexPath.row, type: .news)
         
         return cell
     }}
@@ -109,17 +116,26 @@ extension NewsFeedViewController: UITableViewDataSource {
 extension NewsFeedViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView,
                    heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 230
+        return ConstraintConstants.tableViewHeight
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let singleNews = viewModel.newsArray?.results[indexPath.row] else {
+        guard let singleNews = viewModel.newsArray?[indexPath.row] else {
             return
         }
         
-        let detailVC = NewsDetailViewController(news: singleNews)
+        let detailVM = NewsDetailViewModel(news: singleNews)
+        let detailVC = NewsDetailViewController(viewModel: detailVM, typeOfNews: .news)
         navigationController?.pushViewController(detailVC, animated: true)
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if (((scrollView.contentOffset.y + scrollView.frame.size.height) >
+             scrollView.contentSize.height ) && !isLoadingList) {
+            isLoadingList = true
+            loadMoreItemsForList()
+        }
     }
 }

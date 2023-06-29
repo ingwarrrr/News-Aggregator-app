@@ -22,11 +22,11 @@ class NewsDetailView: UIView {
         view.contentLabel.numberOfLines = 3
         return view
     }()
-    private lazy var newsImageView: UIImageView = {
+    lazy var newsImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = ConstraintConstants.textFieldCornerRadius
+        imageView.layer.cornerRadius = ConstraintConstants.defaultCornerRadius
         return imageView
     }()
 
@@ -37,18 +37,32 @@ class NewsDetailView: UIView {
         setupLayout()
     }
     
-    func setupDetailView(with news: UniqueNewsModel) {
+    func setupDetailView(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
         titleView.contentLabel.text = news.title
         descriptionView.contentLabel.text = news.description
         creatorView.contentLabel.text = news.creator?.first ?? "Неизвестно"
         pubDateView.contentLabel.text = news.pubDate?.formattedDate()
         linkView.contentLabel.text = news.link
         
-        guard let imageData = news.imageData else {
-            setupLayoutWithoutImageView()
-            return
+        switch type {
+        case .news:
+            if let imageData = news.imageData {
+                newsImageView.image = UIImage(data: imageData)
+                setupLayoutWithImageView()
+            } else {
+                newsImageView.image = UIImage(named: StringConstants.noneImage)
+                newsImageView.isHidden = true
+                setupLayoutWithoutImageView()
+            }
+        case .favNews:
+            if news.imageURL != nil {
+                let imageNews = UserDefaultsManager.shared.newsImageArray[index]
+                newsImageView.image = imageNews
+                setupLayoutWithImageView()
+            } else {
+                setupLayoutWithoutImageView()
+            }
         }
-        newsImageView.image = UIImage(data: imageData)
     }
     
     required init?(coder: NSCoder) {
@@ -69,9 +83,9 @@ class NewsDetailView: UIView {
     private func setupLayout() {
         titleView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
-                .offset(ConstraintConstants.labelDefaultHeight)
+                .offset(ConstraintConstants.labelDefaultOffset)
             make.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.equalTo(ConstraintConstants.largeOffset)
         }
         
@@ -79,7 +93,7 @@ class NewsDetailView: UIView {
             make.top.equalTo(titleView.snp.bottom)
                 .offset(ConstraintConstants.largeOffset)
             make.left.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.equalTo(ConstraintConstants.largeOffset)
         }
         
@@ -87,7 +101,7 @@ class NewsDetailView: UIView {
             make.top.equalTo(titleView.snp.bottom)
                 .offset(ConstraintConstants.largeOffset)
             make.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.equalTo(ConstraintConstants.largeOffset)
         }
         
@@ -95,33 +109,35 @@ class NewsDetailView: UIView {
             make.top.equalTo(creatorView.snp.bottom)
                 .offset(ConstraintConstants.mediumOffset)
             make.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.equalTo(ConstraintConstants.giganticOffset)
-        }
-        
-        descriptionView.snp.makeConstraints { make in
-            make.top.equalTo(newsImageView.snp.bottom)
-                .offset(ConstraintConstants.mediumOffset)
-            make.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
-            make.height.greaterThanOrEqualTo(ConstraintConstants.giganticOffset)
         }
         
         linkView.snp.makeConstraints { make in
             make.bottom.equalTo(safeAreaLayoutGuide)
                 .inset(ConstraintConstants.largeOffset)
             make.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.equalTo(ConstraintConstants.largeOffset)
         }
     }
     
     private func setupLayoutWithoutImageView() {
+        descriptionView.contentLabel.numberOfLines = 15
         descriptionView.snp.makeConstraints { make in
             make.top.equalTo(creatorView.snp.bottom)
                 .offset(ConstraintConstants.mediumOffset)
             make.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
+            make.height.greaterThanOrEqualTo(ConstraintConstants.giganticOffset)
+        }
+    }
+    private func setupLayoutWithImageView() {
+        descriptionView.snp.makeConstraints { make in
+            make.top.equalTo(newsImageView.snp.bottom)
+                .offset(ConstraintConstants.mediumOffset)
+            make.left.right.equalToSuperview()
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.height.greaterThanOrEqualTo(ConstraintConstants.giganticOffset)
         }
     }

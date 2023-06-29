@@ -8,42 +8,35 @@
 import Foundation
 
 protocol NewsFeedViewModelType {
-    var newsArray: NewsModel? { get set }
-    
+    var newsModel: [NewsModel]? { get set }
+    var newsArray: [UniqueNewsModel]? { get set }
+
     var getNewsSuccess: ((NewsModel) -> Void)? { get set }
     var getNewsFailure: ((Error) -> Void)? { get set }
     
-    func getNewsData()
+    func getNewsData(for nextPage: String?)
 }
 
-class NewsFeedViewModel: NewsFeedViewModelType {
+final class NewsFeedViewModel: NewsFeedViewModelType {
     
     var getNewsSuccess: ((NewsModel) -> Void)?
     var getNewsFailure: ((Error) -> Void)?
-    var newsArray: NewsModel?
+    
+    var newsModel: [NewsModel]? = []
+    var newsArray: [UniqueNewsModel]? = []
     let networknigApi: NetworkingAPIProtocol
     
     init() {
         networknigApi = NetworkingAPI()
     }
-
-    public func getNewsData() {
-        networknigApi.getNews { [weak self] response in
-            switch response {
-            case .success(let response):
-                self?.newsArray = response
-                self?.getNewsSuccess?(response)
-            case .failure(let error):
-                self?.getNewsFailure?(error)
-            }
-        }
-    }
     
-    public func getImageData() {
-        networknigApi.getNews { [weak self] response in
+    public func getNewsData(for nextPage: String?) {
+        networknigApi.getNewsFor(nextPage: nextPage) { [weak self] response in
             switch response {
             case .success(let response):
-                self?.newsArray = response
+                print(response)
+                self?.newsModel?.append(response)
+                self?.newsArray?.append(contentsOf: response.results)
                 self?.getNewsSuccess?(response)
             case .failure(let error):
                 self?.getNewsFailure?(error)

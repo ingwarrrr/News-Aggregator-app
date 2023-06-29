@@ -26,15 +26,16 @@ class NewsTabBarController: UITabBarController {
         let newsVC = NewsFeedViewController(viewModel: newsVM)
         let newsNC = UINavigationController(rootViewController: newsVC)
         newsNC.tabBarItem = configureTabBarItem(
-            with: "News",
-            and: "tabBarItemNews"
+            with: StringConstants.newsTabBarText,
+            and: StringConstants.newsTabBarImageName
         )
         
-        let favoriteNewsVC = FavoriteNewsViewController()
+        let favoriteNwesVM = FavoriteNewsViewModel()
+        let favoriteNewsVC = FavoriteNewsViewController(viewModel: favoriteNwesVM)
         let favoriteNewsNC = UINavigationController(rootViewController: favoriteNewsVC)
         favoriteNewsNC.tabBarItem = configureTabBarItem(
-            with: "Fav news",
-            and: "tabBarItemFavs"
+            with: StringConstants.favNewsTabBarText,
+            and: StringConstants.favNewsTabBarImageName
         )
         
         self.viewControllers = [newsNC, favoriteNewsNC]

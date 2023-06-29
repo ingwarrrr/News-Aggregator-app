@@ -7,6 +7,11 @@
 
 import UIKit
 
+enum NewsDetailType {
+    case news
+    case favNews
+}
+
 class NewsTableViewCell: UITableViewCell {
     
     static var reuseIdentifier: String { "\(Self.self)" }
@@ -43,7 +48,9 @@ class NewsTableViewCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = ConstraintConstants.textFieldCornerRadius
+        imageView.layer.borderColor = UIColor.blue.cgColor
+        imageView.layer.borderWidth = ConstraintConstants.defaultBorderWidth
+        imageView.layer.cornerRadius = ConstraintConstants.defaultCornerRadius
         return imageView
     }()
 
@@ -67,35 +74,42 @@ class NewsTableViewCell: UITableViewCell {
         self.previewImageView.image = nil
     }
     
-    public func configure(with news: UniqueNewsModel, index: Int) {
+    public func configure(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
         self.titleLabel.text = news.title
         self.descriptionLabel.text = news.description
         self.creatorLabel.text = news.creator?.first
         self.pubDateLabel.text = news.pubDate?.formattedDate()
-        setupPreview(with: news, index: index)
+        setupPreview(with: news, index: index, type: type)
     }
     
-    private func setupPreview(with news: UniqueNewsModel, index: Int) {
-        if let data = news.imageData {
-            self.previewImageView.image = UIImage(data: data)
-        }
-        else if let urlString = news.imageURL {
-            
-            guard let url = URL(string: urlString) else {
-                return
+    private func setupPreview(with news: UniqueNewsModel, index: Int, type: NewsDetailType) {
+        switch type {
+        case .favNews:
+            if let image = UserDefaultsManager.shared.newsImageArray[index] {
+                self.previewImageView.image = image
+            } else {
+                self.previewImageView.image = UIImage(named: StringConstants.noneImage)
             }
-            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
-                guard let data = data,
-                        error == nil,
-                        let newsImage = UIImage(data: data) else {
-                    return
-                }
-                self?.viewModel?.newsArray?.results[index].imageData = data
-                
-                DispatchQueue.main.async {
-                    self?.previewImageView.image = newsImage
-                }
-            }.resume()
+        case .news:
+            if let imageData = news.imageData {
+                self.previewImageView.image = UIImage(data: imageData)
+            } else if let urlString = news.imageURL,
+                    let url = URL(string: urlString) {
+                URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                    guard let data = data,
+                          error == nil,
+                          let newsImage = UIImage(data: data) else {
+                        return
+                    }
+                    self?.viewModel?.newsArray?[index].imageData = data
+                    
+                    DispatchQueue.main.async {
+                        self?.previewImageView.image = newsImage
+                    }
+                }.resume()
+            } else {
+                self.previewImageView.image = UIImage(named: StringConstants.noneImage)
+            }
         }
     }
     
@@ -116,41 +130,42 @@ class NewsTableViewCell: UITableViewCell {
     private func setupLayout() {
         titleLabel.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
         }
         
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom)
                 .offset(ConstraintConstants.smallOffset)
             make.left.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
         }
         
         previewImageView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom)
                 .offset(ConstraintConstants.smallOffset)
             make.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.left.equalTo(descriptionLabel.snp.right)
                 .offset(ConstraintConstants.smallOffset)
-            make.height.equalTo(100)
-            make.width.equalTo(100)
+            make.height.equalTo(ConstraintConstants.imageSideSize)
+            make.width.equalTo(ConstraintConstants.imageSideSize)
         }
         
         pubDateLabel.snp.makeConstraints { make in
             make.left.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.bottom.equalToSuperview()
                 .inset(ConstraintConstants.smallOffset)
         }
         
         creatorLabel.snp.makeConstraints { make in
             make.right.equalToSuperview()
-                .inset(ConstraintConstants.labelDefaultHeight)
+                .inset(ConstraintConstants.labelDefaultOffset)
             make.left.equalTo(pubDateLabel.snp.right)
                 .offset(ConstraintConstants.smallOffset)
             make.bottom.equalToSuperview()
                 .inset(ConstraintConstants.smallOffset)
+            make.width.equalTo(ConstraintConstants.giganticOffset)
         }
     }
 }

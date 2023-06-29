@@ -9,18 +9,21 @@ import Foundation
 import Alamofire
 
 protocol NetworkingAPIProtocol {
-    func getNews(completion: @escaping (Result<NewsModel, Error>) -> Void)
+    func getNewsFor(nextPage: String?, completion: @escaping (Result<NewsModel, Error>) -> Void)
 }
 
-class NetworkingAPI: NetworkingAPIProtocol {
+final class NetworkingAPI: NetworkingAPIProtocol {
     
     // MARK: - Get News Methods
     
-    func getNews(completion: @escaping (Result<NewsModel, Error>) -> Void) {
-        let queryItems = [
-            URLQueryItem(name: "apikey", value: "pub_25236fe42fb232801f31994435c36828de93a"),
-            URLQueryItem(name: "country", value: "cn")
+    func getNewsFor(nextPage: String?, completion: @escaping (Result<NewsModel, Error>) -> Void) {
+        var queryItems = [
+            URLQueryItem(name: QueryItems.apiKeyName, value: QueryItems.apiKeyVal),
+            URLQueryItem(name: QueryItems.countryName, value: QueryItems.countryVal)
         ]
+        if let nextPage = nextPage {
+            queryItems.append(URLQueryItem(name: QueryItems.nextPageName, value: nextPage))
+        }
         
         let urlConstructor = URLConstructor(
             service: .empty,
@@ -28,7 +31,6 @@ class NetworkingAPI: NetworkingAPIProtocol {
             queryItems: queryItems
         )
         guard let url = urlConstructor.createURL() else { return }
-        
         AF.request(url)
             .responseDecodable(of: NewsModel.self) { response in
             switch response.result {
@@ -39,4 +41,12 @@ class NetworkingAPI: NetworkingAPIProtocol {
             }
         }
     }
+}
+
+fileprivate enum QueryItems {
+    static let apiKeyName = "apikey"
+    static let countryName = "country"
+    static let nextPageName = "page"
+    static let apiKeyVal = "pub_25236fe42fb232801f31994435c36828de93a"
+    static let countryVal = "ru"
 }

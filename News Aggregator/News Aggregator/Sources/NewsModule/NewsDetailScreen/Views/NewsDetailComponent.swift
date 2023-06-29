@@ -72,7 +72,7 @@ class NewsDetailComponent: UIView {
     private func setupLayout() {
         titleLabel.snp.makeConstraints { make in
             make.top.left.right.equalToSuperview()
-            make.height.equalTo(ConstraintConstants.labelDefaultHeight)
+            make.height.equalTo(ConstraintConstants.labelDefaultOffset)
         }
         
         contentLabel.snp.makeConstraints { make in
