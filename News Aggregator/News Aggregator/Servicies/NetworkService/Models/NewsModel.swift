@@ -8,25 +8,29 @@
 import Foundation
 
 // MARK: - NewsModel
-struct NewsModel: Decodable {
-    let status: String
-    let totalResults: Int
-    let results: [UniqueNewsModel]
-    let nextPage: String
+struct NewsModel: Codable {
+    let status: String?
+    let totalResults: Int?
+    var results: [UniqueNewsModel]
+    let nextPage: String?
 }
 
 // MARK: - Result
-struct UniqueNewsModel: Decodable {
-    let title: String
-    let link: String
+struct UniqueNewsModel: Codable {
+    let title: String?
+    let link: String?
     let keywords: [String]?
     let creator: [String]?
     let videoURL: String?
-    let description, content, pubDate: String
+    let description: String?
+    let content: String?
+    let pubDate: String?
     let imageURL: String?
-    let sourceID: String
-    let category, country: [String]
-    let language: String
+    var imageData: Data? = nil
+    let sourceID: String?
+    let category: [String]?
+    let country: [String]?
+    let language: String?
 
     enum CodingKeys: String, CodingKey {
         case title, link, keywords, creator

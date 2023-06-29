@@ -8,6 +8,8 @@
 import Foundation
 
 protocol NewsFeedViewModelType {
+    var newsArray: NewsModel? { get set }
+    
     var getNewsSuccess: ((NewsModel) -> Void)? { get set }
     var getNewsFailure: ((Error) -> Void)? { get set }
     
@@ -26,6 +28,18 @@ class NewsFeedViewModel: NewsFeedViewModelType {
     }
 
     public func getNewsData() {
+        networknigApi.getNews { [weak self] response in
+            switch response {
+            case .success(let response):
+                self?.newsArray = response
+                self?.getNewsSuccess?(response)
+            case .failure(let error):
+                self?.getNewsFailure?(error)
+            }
+        }
+    }
+    
+    public func getImageData() {
         networknigApi.getNews { [weak self] response in
             switch response {
             case .success(let response):

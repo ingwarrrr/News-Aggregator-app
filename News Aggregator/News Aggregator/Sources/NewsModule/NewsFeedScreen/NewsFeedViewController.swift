@@ -11,6 +11,17 @@ class NewsFeedViewController: UIViewController {
     
     var viewModel: NewsFeedViewModelType
     
+    private lazy var newsTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(NewsTableViewCell.self,
+            forCellReuseIdentifier: NewsTableViewCell.reuseIdentifier)
+        tableView.backgroundColor = .white
+        tableView.separatorStyle = .singleLine
+        tableView.dataSource = self
+        tableView.delegate = self
+        return tableView
+    }()
+    
     init(viewModel: NewsFeedViewModelType) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -23,8 +34,10 @@ class NewsFeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        viewModel.getNewsData()
+        setupHierarchy()
+        setupLayout()
         bindWithViewModel()
+        viewModel.getNewsData()
     }
     
     private func setupView() {
@@ -32,20 +45,81 @@ class NewsFeedViewController: UIViewController {
         view.backgroundColor = .white
     }
     
+    private func setupHierarchy() {
+        view.addSubviews([
+            newsTableView
+        ])
+    }
+    
+    private func setupLayout() {
+        newsTableView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+    }
+    
     func bindWithViewModel() {
         viewModel.getNewsSuccess = { [weak self] news in
-            print(news)
             DispatchQueue.main.async {
-                
+                self?.newsTableView.reloadData()
             }
         }
         
         viewModel.getNewsFailure = { [weak self] error in
             print(error.localizedDescription)
             DispatchQueue.main.async {
-                
+                self?.newsTableView.reloadData()
             }
         }
     }
 }
 
+
+// MARK: - News UITableViewDataSource
+
+extension NewsFeedViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView,
+                   numberOfRowsInSection section: Int) -> Int {
+        guard let count = viewModel.newsArray?.results.count else {
+            return 0
+        }
+        
+        return count
+    }
+    
+    func tableView(_ tableView: UITableView,
+                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: NewsTableViewCell.reuseIdentifier,
+            for: indexPath
+        ) as? NewsTableViewCell,
+            let singleNews = viewModel.newsArray?.results[indexPath.row]
+        else {
+            return UITableViewCell()
+        }
+        
+        cell.sizeToFit()
+        cell.viewModel = viewModel
+        cell.configure(with: singleNews, index: indexPath.row)
+        
+        return cell
+    }}
+
+// MARK: - News UITableViewDelegate
+
+extension NewsFeedViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView,
+                   heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 230
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let singleNews = viewModel.newsArray?.results[indexPath.row] else {
+            return
+        }
+        
+        let detailVC = NewsDetailViewController(news: singleNews)
+        navigationController?.pushViewController(detailVC, animated: true)
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+}

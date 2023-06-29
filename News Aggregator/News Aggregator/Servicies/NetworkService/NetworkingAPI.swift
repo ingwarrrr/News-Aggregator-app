@@ -19,7 +19,7 @@ class NetworkingAPI: NetworkingAPIProtocol {
     func getNews(completion: @escaping (Result<NewsModel, Error>) -> Void) {
         let queryItems = [
             URLQueryItem(name: "apikey", value: "pub_25236fe42fb232801f31994435c36828de93a"),
-            URLQueryItem(name: "q", value: "pizza")
+            URLQueryItem(name: "country", value: "cn")
         ]
         
         let urlConstructor = URLConstructor(
